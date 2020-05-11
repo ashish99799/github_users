@@ -14,6 +14,7 @@ The application will be used during the interview, please be ready to explain an
 The application shall be hosted on your own GitHub. Also make sure that the application completely works before submitting it. 
 
 Bonus Points: 
+  
   • All results should be cached such that when going back, the results should be still be displayed on the previous screen. 
   • Get infinite scrolling working for the first screen. 
   • Add a way to sign in. 
