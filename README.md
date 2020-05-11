@@ -16,6 +16,9 @@ The application shall be hosted on your own GitHub. Also make sure that the appl
 Bonus Points: 
   
   • All results should be cached such that when going back, the results should be still be displayed on the previous screen. 
+  
   • Get infinite scrolling working for the first screen. 
+  
   • Add a way to sign in. 
+  
   • Anything that displays your mastery over Android Studio, Kotlin, and the understanding of the documentation.
