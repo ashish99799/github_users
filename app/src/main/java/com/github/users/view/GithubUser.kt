@@ -153,11 +153,6 @@ class GithubUser : AppCompatActivity(), GithubUserListener,
         ToastMessage(message)
     }
 
-    fun RipoFilter(query: String) {
-        ripoList = ArrayList<UserRipoData>()
-        ripoList = originalList
-    }
-
     inner class UserRipoAdapter(
         private var context: Context,
         private val AdapterList: ArrayList<UserRipoData>

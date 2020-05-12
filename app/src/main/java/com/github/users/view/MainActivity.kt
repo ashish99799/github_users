@@ -77,9 +77,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener,
         searchClose.setOnClickListener {
             searchView.clearFocus()
             searchView.setQuery("", false)
-            query = ""
-            page = 1
-            listProducts = ArrayList<RowData>()
             onRefresh()
         }
     }
@@ -88,7 +85,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener,
         query = ""
         page = 1
         listProducts = ArrayList<RowData>()
-        searchView.setQuery("", false)
         // Call Api
         viewModel!!.onRefreshData(context!!, query, page)
     }

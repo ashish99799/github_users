@@ -120,7 +120,8 @@
                     android:id="@+id/searchView"
                     style="@style/CustomSearchView"
                     android:focusable="false"
-                    app:iconifiedByDefault="false" />
+                    app:iconifiedByDefault="false"
+                    app:queryHint="Search user ripo" />
 
             </LinearLayout>
 
