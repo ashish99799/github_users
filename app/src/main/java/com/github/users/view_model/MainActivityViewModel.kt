@@ -7,54 +7,46 @@ import com.github.users.model.responses.DataResponse
 import com.github.users.model.responses.RowData
 import com.github.users.utils.CheckInternetConnectionAvailable
 import com.github.users.view.MainActivityListener
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 
 // Override ViewModel
 class MainActivityViewModel : ViewModel() {
 
     // Over Activity Listener
     var mainActivityListener: MainActivityListener? = null
+    private var myCompositeDisposable: CompositeDisposable? = null
 
-    fun onRefreshData(context: Context, query: String, page: Int) {
+    fun getSearchUser(context: Context, query: String, page: Int) {
         // Check Internet connectivity
         if (context.CheckInternetConnectionAvailable()) {
             // API Calling Start
             mainActivityListener?.showProgress()
 
             // Ratrofit API Calling
-            ApiClient().getUserSearch(query, page).enqueue(object : Callback<DataResponse> {
-
-                // Success Response
-                override fun onResponse(
-                    call: Call<DataResponse>,
-                    response: Response<DataResponse>
-                ) {
-                    if (response != null) {
-                        if (response.body() != null) {
-                            mainActivityListener?.onSuccess(response.body()!!.items!! as ArrayList<RowData>)
-                        } else {
-                            mainActivityListener?.onSuccess(ArrayList<RowData>())
-                        }
-                    } else {
-                        mainActivityListener?.onFailure(response.message())
-                    }
-
-                    mainActivityListener?.hideProgress()
-                }
-
-                // Failure Response
-                override fun onFailure(call: Call<DataResponse>, t: Throwable) {
-                    mainActivityListener?.hideProgress()
-                    mainActivityListener?.onFailure("Fail ${t.message}")
-                }
-
-            })
+            myCompositeDisposable = CompositeDisposable()
+            myCompositeDisposable?.add(
+                ApiClient()
+                    .getUserSearch(query, page)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
+            )
         } else {
             // Internet is not connected
             mainActivityListener?.hideProgress()
             mainActivityListener?.onFailure("Please check your internet connection!")
         }
+    }
+
+    private fun onResponse(response: DataResponse) {
+        mainActivityListener?.hideProgress()
+        mainActivityListener?.onSuccess(response.items!! as ArrayList<RowData>)
+    }
+
+    private fun onFailure(error: Throwable) {
+        mainActivityListener?.hideProgress()
+        mainActivityListener?.onFailure("Fail ${error.message}")
     }
 }

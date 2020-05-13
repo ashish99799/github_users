@@ -38,7 +38,6 @@ class GithubUser : AppCompatActivity(), GithubUserListener,
     lateinit var hashMap: HashMap<String, Any>
     lateinit var rowData: RowData
 
-    lateinit var originalList: ArrayList<UserRipoData>
     lateinit var ripoList: ArrayList<UserRipoData>
 
     var viewModel: GithubUserViewModel? = null
@@ -76,15 +75,11 @@ class GithubUser : AppCompatActivity(), GithubUserListener,
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent)
         swipeRefreshLayout.isRefreshing = true
 
-        ripoList = ArrayList<UserRipoData>()
-        originalList = ArrayList<UserRipoData>()
-        onRefresh()
-
         // Call Api User Info
         viewModel!!.onUserInfo(context!!, rowData.login!!)
 
-        // Call Api User Ripo
-        viewModel!!.onUserRipo(context!!, rowData.login!!)
+        ripoList = ArrayList<UserRipoData>()
+        onRefresh()
 
         searchView.setOnQueryTextListener(this)
         val searchClose =
@@ -98,7 +93,8 @@ class GithubUser : AppCompatActivity(), GithubUserListener,
 
     override fun onRefresh() {
         ripoList = ArrayList<UserRipoData>()
-        ripoList = originalList
+        // Call Api User Ripo
+        viewModel!!.onUserRipo(context!!, rowData.login!!)
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {

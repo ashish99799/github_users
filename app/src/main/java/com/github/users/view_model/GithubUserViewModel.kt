@@ -9,6 +9,9 @@ import com.github.users.model.responses.UserData
 import com.github.users.model.responses.UserRipoData
 import com.github.users.utils.CheckInternetConnectionAvailable
 import com.github.users.view.GithubUserListener
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -18,41 +21,39 @@ class GithubUserViewModel : ViewModel() {
 
     // Over Activity Listener
     var githubUserListener: GithubUserListener? = null
+    private var myCompositeDisposable: CompositeDisposable? = null
 
     fun onUserInfo(context: Context, query: String) {
         // Check Internet connectivity
         if (context.CheckInternetConnectionAvailable()) {
-            // API Calling Start
-
             // Ratrofit API Calling
-            ApiClient().getUserInfo(query).enqueue(object : Callback<UserData> {
-
-                // Success Response
-                override fun onResponse(
-                    call: Call<UserData>,
-                    response: Response<UserData>
-                ) {
-                    if (response != null) {
-                        if (response.body() != null) {
-                            githubUserListener?.onSuccess(response.body()!! as UserData)
-                        } else {
-                            githubUserListener?.onSuccess(UserData())
-                        }
-                    } else {
-                        githubUserListener?.onFailure(response.message())
-                    }
-                }
-
-                // Failure Response
-                override fun onFailure(call: Call<UserData>, t: Throwable) {
-                    githubUserListener?.onFailure("Fail ${t.message}")
-                }
-
-            })
+            myCompositeDisposable = CompositeDisposable()
+            myCompositeDisposable?.add(
+                ApiClient()
+                    .getUserInfo(query)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
+            )
         } else {
             // Internet is not connected
             githubUserListener?.onFailure("Please check your internet connection!")
         }
+    }
+
+    private fun onResponse(response: UserData) {
+        githubUserListener?.hideProgress()
+        githubUserListener?.onSuccess(response)
+    }
+
+    private fun onResponseList(response: List<UserRipoData>) {
+        githubUserListener?.hideProgress()
+        githubUserListener?.onSuccess(response)
+    }
+
+    private fun onFailure(error: Throwable) {
+        githubUserListener?.hideProgress()
+        githubUserListener?.onFailure("Fail ${error.message}")
     }
 
     fun onUserRipo(context: Context, query: String) {
@@ -62,33 +63,14 @@ class GithubUserViewModel : ViewModel() {
             githubUserListener?.showProgress()
 
             // Ratrofit API Calling
-            ApiClient().getUserRipo(query).enqueue(object : Callback<List<UserRipoData>> {
-
-                // Success Response
-                override fun onResponse(
-                    call: Call<List<UserRipoData>>,
-                    response: Response<List<UserRipoData>>
-                ) {
-                    if (response != null) {
-                        if (response.body() != null) {
-                            githubUserListener?.onSuccess(response.body()!!)
-                        } else {
-                            githubUserListener?.onSuccess(UserData())
-                        }
-                    } else {
-                        githubUserListener?.onFailure(response.message())
-                    }
-
-                    githubUserListener?.hideProgress()
-                }
-
-                // Failure Response
-                override fun onFailure(call: Call<List<UserRipoData>>, t: Throwable) {
-                    githubUserListener?.hideProgress()
-                    githubUserListener?.onFailure("Fail ${t.message}")
-                }
-
-            })
+            myCompositeDisposable = CompositeDisposable()
+            myCompositeDisposable?.add(
+                ApiClient()
+                    .getUserRipo(query)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ response -> onResponseList(response) }, { t -> onFailure(t) })
+            )
         } else {
             // Internet is not connected
             githubUserListener?.hideProgress()

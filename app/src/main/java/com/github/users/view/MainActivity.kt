@@ -3,6 +3,7 @@ package com.github.users.view
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,10 +67,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener,
         // setup SwipeRefreshLayout
         swipeRefreshLayout.setOnRefreshListener(this)
         swipeRefreshLayout.setColorSchemeResources(R.color.colorAccent)
-        swipeRefreshLayout.isRefreshing = true
-
-        query = ""
-        onRefresh()
 
         searchView.setOnQueryTextListener(this)
         val searchClose =
@@ -85,14 +82,14 @@ class MainActivity : AppCompatActivity(), MainActivityListener,
         query = ""
         page = 1
         listProducts = ArrayList<RowData>()
-        // Call Api
-        viewModel!!.onRefreshData(context!!, query, page)
+        githubUserAdapter = GithubUserAdapter(context!!, listProducts)
+        rvGithubUsers.adapter = githubUserAdapter
     }
 
     override fun onLoadmore(refreshlayout: RefreshLayout?) {
         // Call Api second page
         page++
-        viewModel!!.onRefreshData(context!!, query, page)
+        viewModel!!.getSearchUser(context!!, query, page)
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -100,10 +97,14 @@ class MainActivity : AppCompatActivity(), MainActivityListener,
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
+        if (TextUtils.isEmpty(newText)) {
+            return false
+        }
+
         query = newText.toString()
         page = 1
         listProducts = ArrayList<RowData>()
-        viewModel!!.onRefreshData(context!!, query, page)
+        viewModel!!.getSearchUser(context!!, query, page)
         return false
     }
 
@@ -133,10 +134,6 @@ class MainActivity : AppCompatActivity(), MainActivityListener,
 
     override fun onFailure(message: String) {
         // Error & Failure
-        swipeRefreshLayout.isRefreshing = false
-        if (smartRefresh.isLoading) {
-            smartRefresh.finishLoadmore()
-        }
         ToastMessage(message)
     }
 
@@ -151,7 +148,12 @@ class MainActivity : AppCompatActivity(), MainActivityListener,
         }
 
         fun AddAdapterList(list: ArrayList<RowData>) {
-            this.AdapterList.addAll(list)
+            for (element in list) {
+                if (!AdapterList.contains(element)) {
+                    AdapterList.add(element)
+                }
+            }
+//            this.AdapterList.addAll(list)
             notifyDataSetChanged()
         }
 
