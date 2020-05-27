@@ -1,4 +1,4 @@
-package com.github.users.view
+package com.github.users.ui.listeners
 
 import com.github.users.model.responses.UserData
 import com.github.users.model.responses.UserRipoData

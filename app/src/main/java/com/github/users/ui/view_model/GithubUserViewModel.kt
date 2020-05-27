@@ -1,20 +1,16 @@
-package com.github.users.view_model
+package com.github.users.ui.view_model
 
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.github.users.model.ApiClient
-import com.github.users.model.responses.DataResponse
-import com.github.users.model.responses.RowData
+import com.github.users.model.api.ApiClient
+import com.github.users.model.repositorys.GithubUserRepository
 import com.github.users.model.responses.UserData
 import com.github.users.model.responses.UserRipoData
 import com.github.users.utils.CheckInternetConnectionAvailable
-import com.github.users.view.GithubUserListener
+import com.github.users.ui.listeners.GithubUserListener
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 // Override ViewModel
 class GithubUserViewModel : ViewModel() {
@@ -22,6 +18,11 @@ class GithubUserViewModel : ViewModel() {
     // Over Activity Listener
     var githubUserListener: GithubUserListener? = null
     private var myCompositeDisposable: CompositeDisposable? = null
+    var githubUserRepository: GithubUserRepository
+
+    init {
+        githubUserRepository = GithubUserRepository(ApiClient())
+    }
 
     fun onUserInfo(context: Context, query: String) {
         // Check Internet connectivity
@@ -29,8 +30,8 @@ class GithubUserViewModel : ViewModel() {
             // Ratrofit API Calling
             myCompositeDisposable = CompositeDisposable()
             myCompositeDisposable?.add(
-                ApiClient()
-                    .getUserInfo(query)
+                githubUserRepository
+                    .onUserInfo(query)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
@@ -65,8 +66,8 @@ class GithubUserViewModel : ViewModel() {
             // Ratrofit API Calling
             myCompositeDisposable = CompositeDisposable()
             myCompositeDisposable?.add(
-                ApiClient()
-                    .getUserRipo(query)
+                githubUserRepository
+                    .onUserRipo(query)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
                     .subscribe({ response -> onResponseList(response) }, { t -> onFailure(t) })

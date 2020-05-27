@@ -1,4 +1,4 @@
-package com.github.users.view
+package com.github.users.ui.view
 
 import android.app.Activity
 import android.content.Context
@@ -16,10 +16,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.github.users.R
 import com.github.users.model.responses.RowData
+import com.github.users.ui.listeners.MainActivityListener
 import com.github.users.utils.LoadImage
 import com.github.users.utils.NewIntentWithData
 import com.github.users.utils.ToastMessage
-import com.github.users.view_model.MainActivityViewModel
+import com.github.users.ui.view_model.MainActivityViewModel
 import com.github.users.wegates.RefreshLayoutHelper
 import com.google.gson.Gson
 import com.scwang.smartrefresh.layout.api.RefreshLayout
@@ -27,7 +28,8 @@ import com.scwang.smartrefresh.layout.listener.OnLoadmoreListener
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main_cell.view.*
 
-class MainActivity : AppCompatActivity(), MainActivityListener,
+class MainActivity : AppCompatActivity(),
+    MainActivityListener,
     OnLoadmoreListener, SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener {
 
     // Variable Declaration
@@ -84,6 +86,7 @@ class MainActivity : AppCompatActivity(), MainActivityListener,
         listProducts = ArrayList<RowData>()
         githubUserAdapter = GithubUserAdapter(context!!, listProducts)
         rvGithubUsers.adapter = githubUserAdapter
+        hideProgress()
     }
 
     override fun onLoadmore(refreshlayout: RefreshLayout?) {

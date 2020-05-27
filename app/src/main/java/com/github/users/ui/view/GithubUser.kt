@@ -1,4 +1,4 @@
-package com.github.users.view
+package com.github.users.ui.view
 
 import android.content.Context
 import android.os.Bundle
@@ -18,10 +18,11 @@ import com.github.users.R
 import com.github.users.model.responses.RowData
 import com.github.users.model.responses.UserData
 import com.github.users.model.responses.UserRipoData
+import com.github.users.ui.listeners.GithubUserListener
 import com.github.users.utils.INTENT_DATA
 import com.github.users.utils.LoadImage
 import com.github.users.utils.ToastMessage
-import com.github.users.view_model.GithubUserViewModel
+import com.github.users.ui.view_model.GithubUserViewModel
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.github_user.*
 import kotlinx.android.synthetic.main.github_user_cell.view.*
@@ -29,7 +30,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
-class GithubUser : AppCompatActivity(), GithubUserListener,
+class GithubUser : AppCompatActivity(),
+    GithubUserListener,
     SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener {
 
     // Variable Declaration

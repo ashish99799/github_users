@@ -1,11 +1,10 @@
-package com.github.users.model
+package com.github.users.model.api
 
 import com.github.users.model.responses.DataResponse
 import com.github.users.model.responses.UserData
 import com.github.users.model.responses.UserRipoData
 import io.reactivex.Observable
 import okhttp3.OkHttpClient
-import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
